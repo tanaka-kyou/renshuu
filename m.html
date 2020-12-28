@@ -1,0 +1,949 @@
+<!DOCTYPE html>
+<head>
+<title>?????</title>
+
+<style>
+.card{
+	position:relative;
+	top:10px;left:10px;
+	border:2px solid black;
+	border-radius:5px;
+	width:40px;
+	height:50px;
+	line-height:50px;
+	text-align:center;
+	background-color:white;
+	font-size:20px;
+	margin:8px;
+	float:left;
+}
+.BattleCard{
+	position:relative;
+	top:200px;left:200px;
+	border:2px solid black;
+	border-radius:5px;
+	width:80px;
+	height:100px;
+	line-height:100px;
+	text-align:center;
+	font-size:20px;
+	background-color:white;
+	margin:8px;
+	float:left;
+}
+.BattleCard2{
+	position:relative;
+	top:200px;left:300px;
+	border:2px solid black;
+	border-radius:5px;
+	background-color:white;
+	width:80px;
+	height:100px;
+	line-height:100px;
+	text-align:center;
+	font-size:20px;
+	margin:8px;
+	float:left;
+}
+
+.wait{
+	position:absolute;
+	left:325px;	top:266px;
+	font-size:100px;
+}
+
+.player_result{
+	float:left;
+	position:absolute;
+	top:620px; left:60px;
+	fontcolor:white;
+	font-size:40px;
+
+
+}
+.cpu_result{
+	float:right;
+	position:absolute; 
+	top:20px; right:130px;
+	font-color:white;
+	font-size:40px;
+}
+
+body{
+	width:700px;
+	background-size:cover
+}
+#cpu_field{
+	position:relative;
+	left:0px;
+	width:400px;
+	height:100px;
+
+
+	background:url("field2.png") no-repeat;
+	background-size:100%100%;
+}
+
+#battle_field{
+	width:700px;
+	height:500px;
+
+	background:url("table.png") no-repeat 100%;
+	background-size:100%100%;
+	background-attachment: fixed;
+}
+
+#player_field{
+	position:relative;
+	top:0px;
+	left:302px;
+
+	width:400px;
+	height:100px;
+
+	background:url("field1.png") no-repeat 100%;
+	background-size:100%100%;
+}
+
+
+#saisen{
+	position:absolute;
+	left:320px;	top:470px;
+}
+
+#yama1{
+	float:left;
+	position:absolute;
+	left:150px; top:630px;
+	border:2px solid black;
+	border-radius:5px;
+	width:40px;
+	height:50px;
+	line-height:50px;
+	text-align:center;
+	font-size:20px;
+	margin:8px;
+}
+
+#yama2{
+	float:right;
+	position:relative;
+	right:190px; top:20px;
+	border:2px solid black;
+	border-radius:5px;
+	width:40px;
+	height:50px;
+	line-height:50px;
+	text-align:center;
+	font-size:20px;
+	margin:8px;
+}
+#help{
+	position:absolute;
+	left:270px; top:200px;
+}
+.game{
+	position:relative;
+	left:450px;
+}
+#op{
+	position:relative;
+	border:2px solid black;
+	left:350px;
+	width:800px; height:800px;
+}
+.title{
+	position:absolute;
+	top:50px;left:210px;
+	font-size:70px;
+}
+
+.level{
+	position:relative;
+	font-size:50px;
+	top:170px;left:280px;
+}
+</style>
+
+</head>
+<body>
+
+<div id="op" >
+
+	<h1 class="title">
+		speed HD
+	</h1>
+
+	<p class="level"onclick="start(3000);">cpu level1</p>
+	<p class="level"onclick="start(2000);">cpu level2</p>
+	<p class="level"onclick="start(500);">cpu level3</p>
+	<p class="level"onclick="start(150);">cpu EX</p>	
+</div>
+<div id="game" class="game" style="display:none">
+
+		<div id="result2" class="cpu_result">
+		</div>
+
+		<div id="yama2">
+		</div>
+
+		<div id="cpu_field">
+		</div>
+
+		<div id="timer" class="wait"></div>
+
+		<div id="battle_field">
+
+		</div>
+
+		<div id="player_field">
+		</div>
+
+		<div id="result" class="player_result">
+		</div>
+
+
+		<div id="yama1">
+		</div>
+
+
+		<h2 id="help"></h2>
+	<h3  id="saisen"onclick=restrat(); ></h3>
+</div>
+
+<script>
+let card = [
+	"1","2","3","4","5","6","7","8","9","10","11","12","13",
+	"1","2","3","4","5","6","7","8","9","10","11","12","13",
+	"1","2","3","4","5","6","7","8","9","10","11","12","13",
+	"1","2","3","4","5","6","7","8","9","10","11","12","13"
+	];
+
+//手札の配列
+let player=[];
+let cpu=[];
+
+//今の場に出てる手札の枚数の配列数
+let TehudaNon = 5;
+let TehudaNon2 = 5;
+//カードのdiv要素配列
+let player_div = [];
+let cpu_div = [];
+
+//バトルするカード
+let BattleCard_div = [];
+
+//手札のフィールド
+let cpu_field = document.getElementById("cpu_field");
+let player_field= document.getElementById("player_field");
+let yama1=document.getElementById("yama1");
+let yama2=document.getElementById("yama2");
+
+//勝敗
+let result = document.getElementById("result");
+let result2 = document.getElementById("result2");
+
+let un = 5;
+//選んでいる配列の番号
+let erabu = 0;
+let erabu2 = 0;
+
+//場に出てるカードの値
+let ataimemo = 0;
+let ataimemo2 = 0;
+
+//cpuの手の速さ
+let speed =0;
+//タイマー
+let timer = document.getElementById("timer");
+let reset = document.getElementById("reset");
+let cnt = 0;
+
+//出せるｶｰﾄﾞの数
+let c=0;
+//ヘルプ
+let help = document.getElementById("help");
+let flag = 0;
+//リスタート
+let saisen = document.getElementById("saisen");
+
+let iscard1 = 0 ;
+let iscard2 = 0 ;
+let nothing = 0;
+let nothing2 = 0;
+
+
+function cpulate()
+{
+	setInterval(cpumove,speed)
+}
+//////ゲーム開始 初期化
+function start(level)
+{
+	document.getElementById("op").style.display="none";
+	document.getElementById("game").style.display="block";
+
+	shahhuru(); //シャッフル
+	kubari();   
+	DrawPlayer();
+	DrawBattle();
+	CpuDraw();
+	senntaku();
+	senntaku2();
+
+	speed = level;
+	setTimeout(cpulate,3000);
+
+	setTimeout(issenose,3000); 
+}
+
+//リスタート
+function restrat()
+{
+	if(player.length== 0 || cpu.length == 0)
+	{
+		player=[];
+		cpu = [];
+
+		result.innerText="";
+		result2.innerText="";
+		clreacard(1);
+		clreacard(2);
+
+		shahhuru();
+		kubari();
+
+		DrawPlayer();
+		CpuDraw();
+
+	setTimeout(cpulate,3000);
+		setTimeout(issenose,1000); //最初のランダムドロー
+
+		issenose();
+
+		erabu=0;
+		erabu2=0;
+		senntaku();
+		senntaku2();
+		 TehudaNon = 5;
+		 TehudaNon2 = 5;
+		saisen.innerText="";
+	}
+}
+
+//選んだカードと場のカードを比較
+function judge(eranda)
+{
+	if(eranda == undefined)
+	{
+		eranda == 50; //バグを防ぐ
+	}
+	let zone1 = eranda - ataimemo; //選んだカードと場1の
+	let zone1Absolute = Math.abs(zone1);//		カードの絶対値
+	return zone1Absolute;
+}
+function judge2(eranda)
+{
+	if(eranda == undefined)
+	{
+		eranda == 50; //バを防ぐ
+	}
+	let zone2 = eranda - ataimemo2;//選んだカードと場2の比較
+	let zone2Absolute = Math.abs(zone2);
+	return zone2Absolute;
+}
+
+//出すものがないときの処理
+function checkcard()
+{
+	for(let i=0; i<6; i++)
+	{
+		let plyaerjudge_OF_battle1 = judge(player[i]); //プレイヤーの手札を場の1と比べた絶対値
+		let  plyaerjudge_OF_battle2= judge2(player[i]);//プレイヤーの手札を場の2と比べた絶対値
+
+		let cpujudge_OF_battle1 = judge(cpu[i]);
+		let cpujudge_OF_battle2= judge2(cpu[i]);
+
+		if(plyaerjudge_OF_battle1 == 1 || plyaerjudge_OF_battle2 == 1 ||plyaerjudge_OF_battle1 == 12 || plyaerjudge_OF_battle2 == 12)
+		{
+			c++;
+		}
+		if(cpujudge_OF_battle1 == 1 || cpujudge_OF_battle1 == 12 || cpujudge_OF_battle2 == 1 || cpujudge_OF_battle2 == 12)
+		{
+			c++;
+		}
+		if(i == 5)
+		{
+			if(c == 0)
+			{
+				setTimeout(issenose,3000);
+				timer.style.display="block";
+				timer.innerText="3";
+				setTimeout(count,1000);
+				setTimeout(dis,3000);
+			}else{
+				help.innerText="あと"+c+"枚出せます";	
+				flag=0;
+			}	
+		}
+	}
+c=0;
+}
+
+//cpuの動き/////////////////////////////////////////////////////////////////////////
+function cpumove()
+{
+console.log("スタート///出す前の場の値"+ataimemo,ataimemo2);
+
+
+		if(nothing　> 0 || nothing2 > 0)
+		{
+			nothing=0;
+			nothing2=0;
+			console.log("リセットナッシング"+nothing,nothing2);
+
+		}
+	for(let i=0; i<6; i++)
+	{
+		let cpujudge_OF_battle1 = 0;
+		let cpujudge_OF_battle2= 0;
+
+		 cpujudge_OF_battle1 = judge(cpu[i]);
+		 cpujudge_OF_battle2= judge2(cpu[i]);
+
+		console.log(i+"の計算結果"+cpujudge_OF_battle1,cpujudge_OF_battle2)
+		console.log(cpu.slice(0,6));
+		if(cpujudge_OF_battle1 == 1 || cpujudge_OF_battle1 == 12 ) //手札から場に出せるカードがある場合
+		{
+			iscard1 = i; //出すことのできる配列番号
+			nothing2 = 6; //1の場に出せるときに2の場に出せなくする
+			console.log("抜け１の"+nothing2);
+
+			break;
+		}
+
+		if(cpujudge_OF_battle2 == 1 || cpujudge_OF_battle2 == 12 )
+		{
+			iscard2 = i;
+			nothing = 6;
+			console.log("抜け２の"+nothing);
+
+			break;
+		}
+		else if(cpujudge_OF_battle1 != 1 || cpujudge_OF_battle1 != 12 
+				|| cpujudge_OF_battle2 != 1 || cpujudge_OF_battle2 != 12)
+		{
+				nothing++;
+				nothing2++;
+				console.log("出せ無し/ナッシング"+nothing,nothing2);
+				if(nothing == 6 && nothing2 == 6)
+				{
+					iscard1 = 300;	//バグ防ぎ
+					iscard2 = 300;  
+					console.log("ない",nothing)
+				}
+		}
+	}
+	
+	if(nothing != 6)	//出せるカードがなかったら通らない
+	{
+		console.log("1のぬけさき");
+
+		if(erabu2 == iscard1)
+		{
+			
+			ataimemo = cpu[iscard1];
+			BattleCard_div[0].innerText = ataimemo;
+			clreacard(2);
+			cpu.splice(iscard1,1);
+			yama2.innerText = cpu.length;
+
+			if(cpu.length < 6)
+			{
+				TehudaNon2--;
+			}
+			if(erabu2 > TehudaNon)
+			{
+				erabu--;
+			}
+			CpuDraw();
+			shouhai();
+		}
+
+		else if(erabu2 < iscard1+1)
+		{
+			console.log("場1のカード、右");
+
+			erabu2++;
+				if(erabu2 > TehudaNon)
+				{
+					erabu2 = 0;
+				}
+		}
+		else if(erabu2 > iscard1)
+		{
+			console.log("場1のカード、左");
+
+			erabu2--;
+				if(erabu2 < 0)
+				{
+					erabu2 = TehudaNon;
+				}
+
+		}	
+		senntaku2();
+	}
+
+		
+	if(nothing2 != 6)
+	{
+		console.log("2のぬけさき");
+
+			if(erabu2 == iscard2)
+			{
+
+				ataimemo2 = cpu[iscard2];
+				BattleCard_div[1].innerText = ataimemo2;
+				clreacard(2);
+				cpu.splice(iscard2,1);
+				yama2.innerText = cpu.length;
+				if(cpu.length<6)
+				{
+					TehudaNon2--;
+				}
+				if(erabu2 > TehudaNon)
+				{
+					erabu--;
+				}			
+				CpuDraw();
+				shouhai();
+			}
+			
+			//選んだ手と出せる手の位置を比較
+			else if(erabu2 > iscard2)
+			{
+			console.log("場2のカード、左");
+				erabu2--;
+
+				if(erabu2 < 0)
+				{	
+					erabu2 = TehudaNon2 ;	
+				}
+
+			}
+
+			else if(erabu2 < iscard2)
+			{
+			console.log("場2のカード、右");
+
+				erabu2++;
+
+				if(erabu2 > TehudaNon2)
+				{	
+					erabu2 = 0 ;	
+				}
+			}
+		senntaku2();
+	}
+
+console.log("出した後の場の値"+ataimemo,ataimemo2);
+}
+
+function issenose()//ランダムドロー
+{
+	r = Math.floor(Math.random()*player.length);
+	r2 = Math.floor(Math.random()*cpu.length);
+
+	ataimemo = player[r];
+	ataimemo2 = cpu[r2];
+
+	BattleCard_div[0].innerText = ataimemo;
+	BattleCard_div[1].innerText = ataimemo2;
+
+	clreacard(3); //カードを消す
+
+	player.splice(r,1);//山札から消す
+	cpu.splice(r2,1);//
+
+	cutback();
+
+	DrawPlayer();	
+	CpuDraw();
+
+	if(erabu > TehudaNon)//かんすうにしたい
+	{
+		erabu--;
+			
+	}
+	if(erabu2 > TehudaNon2)
+	{
+		erabu2--;	
+	}
+
+	senntaku();//初期化
+	senntaku2();
+	yama1.innerText=player.length;
+	yama2.innerText=cpu.length;
+
+	shouhai();//勝敗判定
+}
+///////////////////////////////////////////////////////////////////////////////////
+
+//手札をの枚数を合わ関数 ////////////////////////////////////////////////
+function cutback()
+{
+		if(player.length < 6)
+		{
+			TehudaNon--;
+		}
+	
+		if(cpu.length < 6)
+		{	
+			TehudaNon2--;
+		}
+}
+
+function erabipos(erabi,non)
+{
+	if(erabi < 0)
+	{	
+		erabi = non ;	
+		senntaku();
+		senntaku2();
+	}
+	
+	if(erabi > non)
+	{
+		erabi = 0;
+		senntaku();
+		senntaku2();
+	}
+	console.log(erabi);
+	return erabi;
+
+}
+//キーが押された時の処理////////////////////////////////////////////////////////////
+document.onkeydown = function(e)
+{
+	switch( e.keyCode )
+	{
+		//いっせのせ
+		case 16:
+			checkcard();
+		break;
+
+		case 37:erabu--; //左が押された時
+		if(erabu < 0)
+		{	
+			erabu = TehudaNon ;	
+		}	
+		senntaku();
+		break;
+
+		case 39:erabu++;//右
+
+		if(erabu > TehudaNon)
+		{
+			erabu = 0;
+		}		console.log(cpu.slice(0,6));	
+			senntaku();
+			break;
+
+		case 68://右２
+			erabu2++;
+			if(erabu2 > TehudaNon2)
+			{
+				erabu2 = 0;
+			}		
+			senntaku2();
+			break;
+
+		case 87://w
+			battle2();
+			shouhai();
+			help.innerText="";
+			break;
+
+		case 32://スペース
+  			battle();
+			shouhai();
+			help.innerText="";
+			break;
+	}
+}
+//勝敗判定
+function shouhai()
+{
+	if(player.length == 0)
+	{
+		result.innerText="win";
+		result2.innerText="lose";
+		ataimemo=100;
+		ataimemo2=100;
+		BattleCard_div[0].innerText = "終";
+		BattleCard_div[1].innerText = "了";
+		saisen.innerText="リスタート";
+	
+	}
+	if(cpu.length == 0)
+	{
+		result.innerText="lose";
+		result2.innerText="win";
+		ataimemo=100;
+		ataimemo2=100;
+		BattleCard_div[0].innerText = "終";
+		BattleCard_div[1].innerText = "了";
+		saisen.innerText="リスタート";
+
+	}
+
+	if(player.length == 0 && cpu.length == 0) //どちらの山札も0だった時に乱数で決める
+	{
+		un = Math.floor(Math.random()*2);
+		if(un == 1)
+		{
+			result.innerText="win";
+			result2.innerText="lose";
+			BattleCard_div[0].innerText = "終";
+			BattleCard_div[1].innerText = "了";
+			saisen.innerText="リスタート";
+
+		}
+		if(un = 0)
+		{
+			result.innerText="lose";
+			result2.innerText="win";
+			BattleCard_div[0].innerText = "終";
+			BattleCard_div[1].innerText = "了";
+			saisen.innerText="リスタート";
+
+		}
+	}
+}
+
+//バトル関数///////////////////////////////////////////////////////////////////////////
+function battle()
+{	
+	let cardjudge = judge(player[erabu]);
+	let cardjudge2 = judge2(player[erabu]);
+
+	if(cardjudge == 1 || cardjudge == 12)
+	{
+		ataimemo = player[erabu];
+
+		BattleCard_div[0].innerText = ataimemo;
+		clreacard(1);
+
+		player.splice(erabu,1);
+		DrawPlayer();
+		yama1.innerText=player.length;
+
+		if(player.length < 6)
+		{
+			TehudaNon--;
+		}
+
+		if(erabu > TehudaNon)
+		{
+			erabu--;
+		}
+
+		senntaku();
+	}
+	if(cardjudge2 == 1 || cardjudge2 == 12)
+	{
+		ataimemo2 = player[erabu]
+
+		BattleCard_div[1].innerText = ataimemo2;
+		clreacard(1);
+		player.splice(erabu,1);
+		DrawPlayer();
+		yama1.innerText=player.length;
+
+		if(player.length < 6)
+		{
+			TehudaNon--;
+		}
+
+		if(erabu > TehudaNon)
+		{
+			erabu--;
+		}
+		senntaku();
+	}
+}
+
+//手札をすべて消す処理//////////////////////////////////////////////////////////
+function clreacard(cleraname)
+{
+	if(cleraname == 1)
+	{
+		for(let i=0; i<25; i++)
+		{
+			player_div[i].remove();			
+		}	
+	}
+	 if(cleraname == 2)
+	{
+		for(let i=0; i<25; i++)
+		{
+			cpu_div[i].remove();			
+		}	
+	}
+	if(cleraname == 3)
+	{	
+
+		for(let i=0; i<25; i++)
+		{
+			cpu_div[i].remove();
+			player_div[i].remove();			
+		}	
+	}
+
+}
+
+//選ばれてるカードに対する処理///////////////////////////////////////////////////
+function senntaku()
+{
+	for(let i=0; i<6; i++)
+	{
+		if(player_div[erabu] == player_div[i])
+		{
+			player_div[i].style.background="red";	
+
+		}else
+		{
+			player_div[i].style.background="white";
+		}
+	}
+}
+
+function senntaku2()
+{
+
+	for(let i=0; i<6; i++)
+	{
+		if(cpu_div[erabu2] == cpu_div[i])
+		{
+			cpu_div[i].style.background="red";	
+
+		}else
+		{
+			cpu_div[i].style.background="white";
+		}
+	}
+}
+
+//シャッフル関数////////////////////////////////////////////////
+function shahhuru()
+{
+	for(let i=0; i<52; i++)
+	{
+		r = rand(51,0)
+		let tmp = card[i];
+		card[i] = card[r]; 
+		card[r] = tmp;
+	}
+}
+
+//手札を配る//////////////////////////////////////////////////////////////////////////////////
+function kubari ()
+{
+	player = card.slice(0,26);
+	cpu = card.slice(26,52);
+}
+
+//カードの作成、描画///////////////////////////////////////////////////////////////////////////////
+function DrawPlayer()
+{
+	for(let i=0; i<player.length; i++)
+	{
+		player_div[i] = document.createElement("div");
+		player_field.appendChild(player_div[i]);
+		player_div[i].className="card";
+		player_div[i].innerText = player[i];
+		if(i < 6)
+		{
+			player_div[i].src ="1.png";
+		}
+		if(i < 6)
+		{
+			player_div[i].src ="2.png";
+		}
+		if(i < 7)
+		{
+			player_div[i].src ="3.png";
+		}
+		if(i < 7)
+		{
+			player_div[i].src ="4.png";
+		}
+
+
+		//手札だけ表示
+		if(i > 5)
+		{
+			player_div[i].style.display="none";
+		}
+	}
+}
+
+//cpuの手札の描画/////////////////////////////////////////////////////////////////////////////
+function CpuDraw()
+{
+	for(let i = 0; i<cpu.length; i++)
+	{
+		cpu_div[i] = document.createElement("div");
+		cpu_field.appendChild(cpu_div[i]);	
+		cpu_div[i].className="card";
+		cpu_div[i].innerText = cpu[i];
+
+		//手札だけ表示
+		if(i > 5)
+		{
+			cpu_div[i].style.display="none";
+		}
+	}
+}
+
+//バトルカードの描画///////////////////////////////////////////////////////////////////////////
+function DrawBattle()
+{
+	for(let i = 0; i<2; i++)
+	{
+		BattleCard_div[i] = document.createElement("div");
+		BattleCard_div[i].className="BattleCard";
+		battle_field.appendChild(BattleCard_div[i]);
+	}
+	BattleCard_div[1].className="BattleCard2";
+}
+
+//ランダム関数////////////////////////////////////////////////////////////////////////////
+function rand(max,min)
+{
+	return Math.floor(Math.random()*max-min+1)+min;
+}
+
+//カウント処理////////////////////////////////////////////////////////////////////////
+function dis()
+{
+	timer.style.display="none";
+flag=0;
+
+}
+function count()
+{
+
+	timer.innerText="2";
+	
+	setTimeout(count2,1000);
+
+}
+function count2()
+{
+	timer.innerText="1";	
+
+}
+</script>
+</body>
+</html>
